@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "disableBypassPermissionsMode": "disable",
+    "deny": [
+      "Bash(*robot_enable*)",
+      "Bash(*robot_disable*)",
+      "Bash(*rosservice call*)",
+      "Bash(*rostopic pub*)",
+      "Bash(*rosrun*)",
+      "Bash(*moveit_planning_execution*)",
+      "Bash(*robot_interface_streaming*)",
+      "Bash(*motoman_driver*)",
+      "Bash(*robot_ip*)",
+      "Bash(*random_mover*)",
+      "Bash(*joint_path_command*)",
+      "Bash(*follow_joint_trajectory*)",
+      "Bash(*moveit_commander*)",
+      "Bash(*bringup*)",
+      "Bash(*nmcli*up*)",
+      "mcp__terminal__run_in_terminal",
+      "mcp__terminal__open_terminal_tab"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit|mcp__terminal__run_in_terminal|mcp__terminal__open_terminal_tab",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x /etc/claude-code/robot_safety_guard.py ] && exec python3 -I /etc/claude-code/robot_safety_guard.py || { echo 'ROBOT-SAFETY GUARD MISSING (blocking for safety)' >&2; exit 2; }",
+            "onFailure": "block",
+            "timeout": 15,
+            "statusMessage": "Robot-safety guard..."
+          }
+        ]
+      }
+    ]
+  }
+}

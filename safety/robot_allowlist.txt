@@ -1,0 +1,21 @@
+# Commands Claude is explicitly allowed to run despite touching the ROS/robot environment.
+# One Python regex per line, matched against the WHOLE command after quotes/backslashes are
+# removed. Edit only as the user (installed copy lives in /etc/claude-code, root-owned).
+# Keep it tiny and exact. Nothing here may move a real robot.
+
+# Read-only reachability check of the controller (a ping cannot move the robot).
+^ping -c [0-9]+( -W [0-9]+)? 192\.168\.255\.3$
+
+# SIMULATION ONLY: MoveIt demo with fake controllers, on an ISOLATED ROS master (port 11999),
+# so it can never join the ROS graph of a real-robot session on the default port 11311.
+^(nohup )?distrobox enter noetic -- bash -l -c roslaunch -p 11999 motoman_sda10f_moveit_config demo\.launch( 2>&1| > \S+| &)*$
+
+# Build/inspect scripts inside the container (their content is scanned for motion/robot patterns).
+^distrobox enter noetic -- bash -l (/home/roblab/catkin_ws/env/[A-Za-z0-9_]+\.sh|/tmp/claude-1000/\S+/scratchpad/[A-Za-z0-9_]+\.sh)( 2>&1)?( \| tail( -n?[0-9]+)?)?$
+
+# Look at / stop the simulation processes.
+^docker exec noetic pgrep -a [A-Za-z_|]+$
+^docker exec noetic pkill -f demo\.launch$
+
+# Run the guard's own self-test.
+^python3 -I /home/roblab/catkin_ws/env/safety/test_guard\.py$
