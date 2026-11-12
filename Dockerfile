@@ -61,3 +61,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # The container hostname (noetic.<host>) does not resolve, which breaks ROS master lookups between terminals.
 # Default to localhost; override ROS_HOSTNAME/ROS_IP yourself if a ROS node on another machine must connect.
 RUN echo 'export ROS_HOSTNAME="${ROS_HOSTNAME:-localhost}"' >> /etc/profile.d/ros-noetic.sh
+
+# --- Intel RealSense D435 (no GPU needed). The ROS-packaged librealsense uses the userspace USB backend. ---
+# Host side needs the udev rule in env/udev/ (device permissions); see env/README.md.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ros-noetic-realsense2-camera ros-noetic-realsense2-description usbutils \
+    && rm -rf /var/lib/apt/lists/*
+# print where the RealSense command-line tools ended up (build log only; never fails the build)
+RUN dpkg -L ros-noetic-librealsense2 | grep -iE 'bin/|rules' || true

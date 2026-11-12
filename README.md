@@ -12,6 +12,13 @@ docker build -t local/ros-noetic-motoman:latest ~/catkin_ws/env
 distrobox assemble create --file ~/catkin_ws/env/distrobox.ini
 distrobox enter noetic -- bash -l ~/catkin_ws/env/build_ws.sh
 ```
+RealSense D435 (host, one time): lets a normal user open the camera.
+```bash
+sudo cp ~/catkin_ws/env/udev/99-realsense.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+The camera must link at USB 3 (`lsusb -t` shows 5000M); with a bad/USB 2 cable it re-enumerates and sends no frames.
+
 Back up the image in case the Focal/Noetic repos disappear:
 `docker save local/ros-noetic-motoman:latest | gzip > ros-noetic-motoman.tar.gz`
 

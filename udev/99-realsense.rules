@@ -1,0 +1,9 @@
+# Lets the normal user (and the Distrobox container, which shares /dev) open Intel RealSense cameras
+# without root. Minimal rule for the D435 family; the camera re-enumerates when streaming starts, so the
+# rule matches by vendor/product ID, not by device path.
+# Install (host):  sudo cp ~/catkin_ws/env/udev/99-realsense.rules /etc/udev/rules.d/
+#                  sudo udevadm control --reload-rules && sudo udevadm trigger
+#   8086:0b07 = D435    8086:0b3a = D435i    8086:0adb = D435 (firmware-update / recovery mode)
+SUBSYSTEM=="usb", ATTRS{idVendor}=="8086", ATTRS{idProduct}=="0b07", MODE="0666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="8086", ATTRS{idProduct}=="0b3a", MODE="0666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="8086", ATTRS{idProduct}=="0adb", MODE="0666", GROUP="plugdev"
